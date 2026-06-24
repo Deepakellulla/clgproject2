@@ -92,7 +92,7 @@ class TelegramUserbot:
     async def start(self):
         """Start the userbot"""
         try:
-            await self.client.start(phone_number=PHONE_NUMBER)
+            await self.client.start(phone=PHONE_NUMBER)
             logger.info("✅ Userbot started successfully")
             me = await self.client.get_me()
             logger.info(f"Logged in as: {me.first_name} (@{me.username})")
