@@ -18,8 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY telegram_userbot.py .
 COPY message.txt .
 
-# Create volumes for persistent storage
-VOLUME ["/app/sessions", "/app/logs"]
+# Create directories for persistent data
+RUN mkdir -p /app/sessions /app/logs
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
