@@ -208,29 +208,29 @@ class TelegramUserbot:
         
             logger.info(f"🚀 Starting broadcast to {len(members)} members")
         
-        for user_id in members:
-            # Check if we should skip this user
-            if await self.should_skip_user(user_id):
-                skipped += 1
-                continue
+            for user_id in members:
+                # Check if we should skip this user
+                if await self.should_skip_user(user_id):
+                    skipped += 1
+                    continue
             
             # Send DM
-            if await self.send_dm_with_retry(user_id, message):
-                successful += 1
-                
-                # ✅ ADD TO BLACKLIST - NEVER DM THIS USER AGAIN
-                self.user_blacklist.add(user_id)
-                self.save_state()
-            else:
-                failed += 1
+                if await self.send_dm_with_retry(user_id, message):
+                    successful += 1
+                    
+                    # ✅ ADD TO BLACKLIST - NEVER DM THIS USER AGAIN
+                    self.user_blacklist.add(user_id)
+                    self.save_state()
+                else:
+                    failed += 1
             
             # Rate limiting
-            await asyncio.sleep(self.rate_limit_delay)
+                await asyncio.sleep(self.rate_limit_delay)
         
-        logger.info(f"📊 Broadcast completed - Sent: {successful}, Failed: {failed}, Skipped: {skipped}")
+            logger.info(f"📊 Broadcast completed - Sent: {successful}, Failed: {failed}, Skipped: {skipped}")
         
-    except Exception as e:
-        logger.error(f"Error during broadcast: {e}")
+        except Exception as e:
+            logger.error(f"Error during broadcast: {e}")
 
     async def main_loop(self):
         """Main bot loop"""
