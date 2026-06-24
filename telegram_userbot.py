@@ -199,44 +199,38 @@ class TelegramUserbot:
         return False
 
     async def broadcast_dm(self, message: str, include_list: List[int] = None):
-        """Send DM to members who haven't received one recently"""
-        try:
-            members = include_list or await self.get_group_members()
-            successful = 0
-            failed = 0
-            skipped = 0
+    """Send DM to members (only once per user)"""
+    try:
+        members = include_list or await self.get_group_members()
+        successful = 0
+        failed = 0
+        skipped = 0
+        
+        logger.info(f"🚀 Starting broadcast to {len(members)} members")
+        
+        for user_id in members:
+            # Check if we should skip this user
+            if await self.should_skip_user(user_id):
+                skipped += 1
+                continue
             
-            logger.info(f"🚀 Starting broadcast to {len(members)} members")
+            # Send DM
+            if await self.send_dm_with_retry(user_id, message):
+                successful += 1
+                
+                # ✅ ADD TO BLACKLIST - NEVER DM THIS USER AGAIN
+                self.user_blacklist.add(user_id)
+                self.save_state()
+            else:
+                failed += 1
             
-            for user_id in members:
-                # Check if we should skip this user
-                if await self.should_skip_user(user_id):
-                    skipped += 1
-                    continue
-                
-                # Check if already DMed recently
-                if user_id in self.dm_history:
-                    last_dm = self.dm_history[user_id]
-                    if datetime.now() - last_dm < timedelta(seconds=self.dm_interval):
-                        continue
-                
-                # Send DM
-                # Send DM
-                if await self.send_dm_with_retry(user_id, message):
-                    successful += 1
-                else:
-                    failed += 1
-                
-                # Rate limiting - KEEP THIS!
-                await asyncio.sleep(self.rate_limit_delay)
-                
-                # Rate limiting
-                await asyncio.sleep(self.rate_limit_delay)
-            
-            logger.info(f"📊 Broadcast completed - Sent: {successful}, Failed: {failed}, Skipped: {skipped}")
-            
-        except Exception as e:
-            logger.error(f"Error during broadcast: {e}")
+            # Rate limiting
+            await asyncio.sleep(self.rate_limit_delay)
+        
+        logger.info(f"📊 Broadcast completed - Sent: {successful}, Failed: {failed}, Skipped: {skipped}")
+        
+    except Exception as e:
+        logger.error(f"Error during broadcast: {e}")
 
     async def main_loop(self):
         """Main bot loop"""
