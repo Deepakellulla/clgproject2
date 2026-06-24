@@ -1,0 +1,11 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "python telegram_userbot.py"
+restartPolicyType = "always"
+restartPolicyMaxRetries = 5
+healthchecks.enabled = true
+
+[environments.production]
+variables = {}

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  telegram-userbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-userbot
+    
+    # Environment variables - either from .env file or override here
+    env_file:
+      - .env
+    
+    # Volumes for persistent data
+    volumes:
+      - ./session:/app/sessions
+      - ./logs:/app/logs
+      - ./bot_state.json:/app/bot_state.json
+      - ./message.txt:/app/message.txt
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/bot_state.json') else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Watchtower for auto-updates (uncomment to enable)
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: --interval 300 telegram-userbot
+  #   restart: unless-stopped
