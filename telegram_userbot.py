@@ -8,7 +8,7 @@ Features:
 - Logging and error handling
 - Persistent state management
 """
-
+from telethon.sessions import StringSession
 import asyncio
 import logging
 from datetime import datetime, timedelta
@@ -46,7 +46,13 @@ logger = logging.getLogger(__name__)
 
 class TelegramUserbot:
     def __init__(self):
-        self.client = TelegramClient('session', API_ID, API_HASH)
+        SESSION_STRING = os.getenv("SESSION_STRING")
+
+        self.client = TelegramClient(
+            StringSession(SESSION_STRING),
+            API_ID,
+            API_HASH
+        )
         self.group_id = GROUP_ID
         self.dm_interval = DM_INTERVAL
         self.rate_limit_delay = RATE_LIMIT_DELAY
@@ -92,7 +98,10 @@ class TelegramUserbot:
     async def start(self):
         """Start the userbot"""
         try:
-            await self.client.start()
+            await self.client.connect()
+            if not await self.client.is_user_authorized():
+                logger.error("Invalid session string")
+                return
             logger.info("✅ Userbot started successfully")
             me = await self.client.get_me()
             logger.info(f"Logged in as: {me.first_name} (@{me.username})")
