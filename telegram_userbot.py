@@ -199,7 +199,7 @@ class TelegramUserbot:
         return False
 
     async def broadcast_dm(self, message: str, include_list: List[int] = None):
-    """Send DM to members (only once per user)"""
+        """Send DM to members (only once per user)"""
         try:
             members = include_list or await self.get_group_members()
             successful = 0
