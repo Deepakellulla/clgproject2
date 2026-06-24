@@ -221,8 +221,14 @@ class TelegramUserbot:
                         continue
                 
                 # Send DM
+                # Send DM
                 if await self.send_dm_with_retry(user_id, message):
                     successful += 1
+                
+                    # Never DM this user again
+                    self.user_blacklist.add(user_id)
+                    self.save_state()
+                
                 else:
                     failed += 1
                 
