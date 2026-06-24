@@ -224,13 +224,11 @@ class TelegramUserbot:
                 # Send DM
                 if await self.send_dm_with_retry(user_id, message):
                     successful += 1
-                
-                    # Never DM this user again
-                    self.user_blacklist.add(user_id)
-                    self.save_state()
-                
                 else:
                     failed += 1
+                
+                # Rate limiting - KEEP THIS!
+                await asyncio.sleep(self.rate_limit_delay)
                 
                 # Rate limiting
                 await asyncio.sleep(self.rate_limit_delay)
