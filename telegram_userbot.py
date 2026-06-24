@@ -206,7 +206,7 @@ class TelegramUserbot:
             failed = 0
             skipped = 0
         
-        logger.info(f"🚀 Starting broadcast to {len(members)} members")
+            logger.info(f"🚀 Starting broadcast to {len(members)} members")
         
         for user_id in members:
             # Check if we should skip this user
