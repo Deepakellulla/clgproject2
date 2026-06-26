@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
-COPY telegram_userbot.py .
+COPY telegram_userbot_final.py .
 COPY message.txt .
 
 # Create directories for persistent data
